@@ -7,6 +7,8 @@ import {
     updateDoc,
     deleteDoc,
     doc,
+    query,
+    where,
 } from "firebase/firestore";
 
 // Obtener todos los números comprados
@@ -48,10 +50,49 @@ export const getNumeroCompradoById = async (id: string) => {
 // Agregar un nuevo número comprado
 export const addNumeroComprado = async (data: any) => {
     try {
+        const { rifaId, numero, comprador_id } = data;
+
+        if (!rifaId || numero === undefined || !comprador_id) {
+            throw new Error(
+                "Faltan datos obligatorios (rifaId, numero, comprador_id)"
+            );
+        }
+
+        // 1️⃣ Obtener la rifa para validar el rango de números
+        const rifaRef = doc(db, "rifas", rifaId);
+        const rifaSnap = await getDoc(rifaRef);
+
+        if (!rifaSnap.exists()) {
+            throw new Error("La rifa no existe");
+        }
+
+        const rifaData = rifaSnap.data();
+        const cantidadMaxima = rifaData?.cantidad || 0; // Máximo de números disponibles en la rifa
+
+        // 2️⃣ Validar que el número comprado esté dentro del rango permitido
+        if (numero < 0 || numero > cantidadMaxima) {
+            throw new Error(`El número debe estar entre 0 y ${cantidadMaxima}`);
+        }
+
+        // 3️⃣ Verificar si el número ya está comprado
+        const q = query(
+            collection(db, "numeros_comprados"),
+            where("rifaId", "==", rifaId),
+            where("numero", "==", numero)
+        );
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            throw new Error(
+                `El número ${numero} ya ha sido comprado en esta rifa`
+            );
+        }
+
+        // 4️⃣ Si todo está correcto, registrar la compra
         const docRef = await addDoc(collection(db, "numeros_comprados"), data);
-        return { message: "Número comprado creado", id: docRef.id };
+        return { message: "Número comprado con éxito", id: docRef.id };
     } catch (error: any) {
-        throw new Error("Error al crear número comprado: " + error.message);
+        throw new Error("Error al comprar número: " + error.message);
     }
 };
 

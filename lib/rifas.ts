@@ -26,6 +26,14 @@ export const getRifas = async () => {
 // Agregar una nueva rifa
 export const addRifa = async (data: any) => {
     try {
+        const cantidadMaxima = 9999999;
+        const { cantidad } = data;
+
+        if (cantidad > cantidadMaxima) {
+            throw new Error(
+                `La cantidad de boletos no puede exceder ${cantidadMaxima}.`
+            );
+        }
         const docRef = await addDoc(collection(db, "rifas"), data);
         return { message: "Rifa creada", id: docRef.id };
     } catch (error: any) {
@@ -52,6 +60,14 @@ export const getRifaById = async (id: string) => {
 // Actualizar una rifa
 export const updateRifa = async (id: string, data: any) => {
     try {
+        const cantidadMaxima = 9999999;
+        const { cantidad } = data;
+
+        if (cantidad && cantidad > cantidadMaxima) {
+            throw new Error(
+                `La cantidad de boletos no puede exceder ${cantidadMaxima}.`
+            );
+        }
         const docRef = doc(db, "rifas", id);
         await updateDoc(docRef, data);
         return { message: "Rifa actualizada" };
