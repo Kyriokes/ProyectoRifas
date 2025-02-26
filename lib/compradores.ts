@@ -7,6 +7,7 @@ import {
     getDoc,
     updateDoc,
     deleteDoc,
+    serverTimestamp,
 } from "firebase/firestore";
 
 // Obtener todos los compradores
@@ -28,7 +29,10 @@ export const getCompradores = async () => {
 // Agregar un nuevo comprador
 export const addComprador = async (data: any) => {
     try {
-        const docRef = await addDoc(collection(db, "compradores"), data);
+        const docRef = await addDoc(collection(db, "compradores"), {
+            ...data,
+            fecha_registro: serverTimestamp(),
+        });
         return { message: "Comprador creado", id: docRef.id };
     } catch (error: any) {
         throw new Error("Error al crear comprador: " + error.message);
