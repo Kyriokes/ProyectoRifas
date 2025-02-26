@@ -3,17 +3,37 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // This rule allows anyone with your Firestore database reference to view, edit,
-    // and delete all data in your Firestore database. It is useful for getting
-    // started, but it is configured to expire after 30 days because it
-    // leaves your app open to attackers. At that time, all client
-    // requests to your Firestore database will be denied.
-    //
-    // Make sure to write security rules for your app before that time, or else
-    // all client requests to your Firestore database will be denied until you Update
-    // your rules
-    match /{document=**} {
-      allow read, write: if request.time < timestamp.date(2025, 3, 27);
+    // Reglas para "numeros_comprados"
+    match /numeros_comprados/{idNumero} {
+      allow read: if true; // Cualquier usuario puede leer
+      allow create: if request.auth != null; // Solo usuarios autenticados pueden comprar números
+      allow update: if request.auth != null && request.auth.uid == resource.data.comprador_id; // Solo el comprador puede actualizar
+      allow delete: if false; // Nadie puede eliminar números comprados
+    }
+
+    // Reglas para "compradores"
+    match /compradores/{idComprador} {
+      allow read: if request.auth != null && request.auth.uid == idComprador; // Solo el comprador puede ver sus datos
+      allow create: if request.auth != null; // Solo usuarios autenticados pueden registrarse
+      allow update: if request.auth != null && request.auth.uid == idComprador; // Solo el comprador puede modificar sus datos
+      allow delete: if false; // No se permite eliminar compradores
+    }
+
+    // Reglas para "metodos_pago"
+    match /metodos_pago/{idMetodo} {
+      allow read: if true; // Cualquier usuario puede ver los métodos de pago
+      allow create, update, delete: if request.auth != null && request.auth.token.admin == true; // Solo admin puede modificar
+    }
+
+    // Reglas para "rifas"
+    match /rifas/{idRifa} {
+      allow read: if true; // Cualquier usuario puede ver las rifas
+      allow create, update, delete: if request.auth != null && request.auth.token.admin == true; // Solo admin puede modificar
+    }
+
+    // Reglas para "usuarios" (Admin)
+    match /usuarios/{idUsuario} {
+      allow read, create, update, delete: if request.auth != null && request.auth.token.admin == true; // Solo admin puede gestionar usuarios
     }
   }
 }
