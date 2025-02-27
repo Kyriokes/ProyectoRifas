@@ -78,7 +78,8 @@ export const addNumeroComprado = async (data: any) => {
         const q = query(
             collection(db, "numeros_comprados"),
             where("rifaId", "==", rifaId),
-            where("numero", "==", numero)
+            where("numero", "==", numero),
+            where("estado", "in", [1, 2]) // Bloquea solo los números reservados o pagados
         );
         const querySnapshot = await getDocs(q);
 
