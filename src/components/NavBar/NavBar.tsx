@@ -24,9 +24,16 @@ export const NavBar = () => {
         )
         : (
           <div className="fixed w-full">
-            <div className=" w-full h-[10%] flex justify-between items-center px-3 sm:px-10 md:px-24 py-3 bg-yellow-500">
-              <h1 className="font-bold text-3xl">RIFULI</h1>
-              <button onClick={()=> setOpen(!open)}><Menu/></button>
+            <div className=" w-full h-[10%] flex justify-between items-center px-3 sm:px-10 md:px-16 py-3 bg-yellow-500">
+              <h1 className="font-bold text-3xl md:text-4xl">RIFULI</h1>
+              <button onClick={()=> setOpen(!open)} className="md:hidden"><Menu/></button>
+              <div className="hidden md:flex md:gap-2 lg:gap-10">
+                <p className="hover:bg-yellow-600 md:p-2 lg:py-2 lg:px-4 md:text-lg rounded">Inicio</p>
+                <p className="hover:bg-yellow-600 md:p-2 lg:py-2 lg:px-4 md:text-lg rounded">Boletos</p>
+                <p className="hover:bg-yellow-600 md:p-2 lg:py-2 lg:px-4 md:text-lg rounded">Verificador</p>
+                <p className="hover:bg-yellow-600 md:p-2 lg:py-2 lg:px-4 md:text-lg rounded">Contacto</p>
+                <p className="hover:bg-yellow-600 md:p-2 lg:py-2 lg:px-4 md:text-lg rounded">Administrados</p>
+              </div>
             </div>
           </div>
         )
