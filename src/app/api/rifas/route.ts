@@ -9,26 +9,16 @@ import {
 
 export async function GET(request: Request) {
     try {
-        // Si no se pasa ID, obtener todos las rifas
-        const rifas = await getRifas();
-        return NextResponse.json(rifas);
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-}
+        const { searchParams } = new URL(request.url);
+        const id = searchParams.get("id");
 
-export async function GET_BY_ID(request: Request) {
-    try {
-        // Obtener el ID de la URL de la forma más segura
-        const urlParts = request.url.split("/");
-        const id = urlParts[urlParts.length - 1]; // Tomamos el último valor como el ID de la rifa
-
-        if (!id || typeof id !== "string") {
-            throw new Error("ID de rifa no proporcionado o inválido");
+        if (id) {
+            const rifa = await getRifaById(id);
+            return NextResponse.json(rifa);
         }
 
-        const rifa = await getRifaById(id);
-        return NextResponse.json(rifa);
+        const rifas = await getRifas();
+        return NextResponse.json(rifas);
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
