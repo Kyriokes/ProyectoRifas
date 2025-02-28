@@ -9,24 +9,16 @@ import {
 
 export async function GET(request: Request) {
     try {
-        const metodosPago = await getMetodosPago();
-        return NextResponse.json(metodosPago);
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-}
+        const { searchParams } = new URL(request.url);
+        const id = searchParams.get("id");
 
-export async function GET_BY_ID(request: Request) {
-    try {
-        const urlParts = request.url.split("/");
-        const id = urlParts[urlParts.length - 1]; // Obtener el último valor de la URL como ID
-
-        if (!id || typeof id !== "string") {
-            throw new Error("ID de método de pago no proporcionado o inválido");
+        if (id) {
+            const metodoPago = await getMetodoPagoById(id);
+            return NextResponse.json(metodoPago);
         }
 
-        const metodoPago = await getMetodoPagoById(id);
-        return NextResponse.json(metodoPago);
+        const metodosPago = await getMetodosPago();
+        return NextResponse.json(metodosPago);
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }

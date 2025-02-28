@@ -8,12 +8,23 @@ import {
 } from "../../../../lib/compradores";
 
 // Ruta GET para obtener todos los compradores
-export async function GET() {
+export async function GET(request: Request): Promise<NextResponse> {
     try {
+        const { searchParams } = new URL(request.url);
+        const id = searchParams.get("id");
+
+        if (id) {
+            const comprador = await getCompradorById(id);
+            return NextResponse.json(comprador);
+        }
+
         const compradores = await getCompradores();
         return NextResponse.json(compradores);
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
+        return NextResponse.json({ error: "Unknown error" }, { status: 500 });
     }
 }
 
@@ -28,20 +39,6 @@ export async function POST(request: Request) {
     }
 }
 
-// Ruta GET para obtener un comprador por ID
-export async function GET_ONE(request: Request) {
-    try {
-        const { searchParams } = new URL(request.url);
-        const id = searchParams.get("id");
-        if (!id) {
-            throw new Error("ID del comprador es necesario");
-        }
-        const comprador = await getCompradorById(id);
-        return NextResponse.json(comprador);
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-}
 
 // Ruta PUT para actualizar un comprador
 export async function PUT(request: Request) {
